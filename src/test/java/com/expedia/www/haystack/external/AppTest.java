@@ -1,4 +1,4 @@
-package com.expedia.www.haystack;
+package com.expedia.www.haystack.external;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
