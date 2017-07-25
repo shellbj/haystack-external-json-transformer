@@ -3,6 +3,8 @@ package com.expedia.www.haystack.external;
 import com.expedia.open.tracing.Log;
 import com.expedia.open.tracing.Span;
 import com.expedia.open.tracing.Tag;
+import com.google.protobuf.util.JsonFormat;
+import com.google.protobuf.util.JsonFormat.Printer;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.nio.charset.Charset;
@@ -12,6 +14,8 @@ import java.util.Map;
 
 public class SpanJsonSerializer implements Serializer<Span> {
 
+    final Printer printer = JsonFormat.printer().omittingInsignificantWhitespace();
+
     @Override
     public void configure(Map<String, ?> map, boolean b) {
         // Nothing to do
@@ -20,6 +24,7 @@ public class SpanJsonSerializer implements Serializer<Span> {
     @Override
     public byte[] serialize(String s, Span span) {
         try {
+            //return printer.print(span).getBytes(Charset.forName("UTF-8"));
             // TODO Replace with gson-based serialization from protobuf 3 code
             // TODO metrics (count, maybe latency, maybe message size)
             return JsonSerializer.serialize(span).getBytes(Charset.forName("UTF-8"));
@@ -50,23 +55,27 @@ public class SpanJsonSerializer implements Serializer<Span> {
         private final static String SPAN_ID = "\"spanId\":\"%s\"";
         private final static String PARENT_SPAN_ID = "\"parentSpanId\":\"%s\"";
         private final static String OPERATION_NAME = "\"operationName\":\"%s\"";
-        private final static String START_TIME = "\"startTime\":%d";
-        private final static String DURATION = "\"duration\":%d";
-        private final static String LOGS = "\"logs\":[%s]";
-        private final static String TAGS = "\"tags\":[%s]";
-        private final static String LOG = "{\"timestamp\":%d,\"fields\":[%s]}";
+        private final static String START_TIME = "\"startTime\":\"%d\"";
+        private final static String DURATION = "\"duration\":\"%d\"";
+        private final static String LOGS = ",\"logs\":[%s]";
+        private final static String TAGS = ",\"tags\":[%s]";
+        private final static String LOG = "{\"timestamp\":\"%d\",\"fields\":[%s]}";
         private final static String STRING_FIELD_OR_TAG = "{\"key\":\"%s\",\"vStr\":\"%s\"}";
-        private final static String LONG_FIELD_OR_TAG = "{\"key\":\"%s\",\"vLong\":%d}";
-        private final static String DOUBLE_FIELD_OR_TAG = "{\"key\":\"%s\",\"vDouble\":%f}";
+        private final static String LONG_FIELD_OR_TAG = "{\"key\":\"%s\",\"vLong\":\"%d\"}";
+        private final static String DOUBLE_FIELD_OR_TAG = "{\"key\":\"%s\",\"vDouble\":%s}";
         private final static String BOOL_FIELD_OR_TAG = "{\"key\":\"%s\",\"vBool\":%b}";
         private final static String BYTES_FIELD_OR_TAG = "{\"key\":\"%s\",\"vBytes\":\"%s\"}";
-        private final static String LINE = String.format("{%s,%s,%s,%s,%s,%s,%s,%s}",
-                TRACE_ID, SPAN_ID, PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION, LOGS, TAGS);
+        private final static String LINE = String.format("{%s,%s,%s,%s,%s,%s%s%s}",
+                TRACE_ID, SPAN_ID, PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION, "%s", "%s");
+        private final static String EMPTY_LOGS = String.format(LOGS, "");
+        private final static String EMPTY_TAGS = String.format(TAGS, "");
 
         static String serialize(final Span span) {
+            final String logs = createLogs(span);
+            final String tags = createTags(span);
             return String.format(LINE, span.getTraceId(), span.getSpanId(), span.getParentSpanId(),
-                    span.getOperationName(), span.getStartTime(), span.getDuration(), createLogs(span),
-                    createTags(span));
+                    span.getOperationName(), span.getStartTime(), span.getDuration(),
+                    EMPTY_LOGS.equals(logs) ? "" : logs, EMPTY_TAGS.equals(tags) ? "" : tags);
         }
 
         private static String createLogs(final Span span) {
@@ -76,11 +85,11 @@ public class SpanJsonSerializer implements Serializer<Span> {
                 logs[logIndex++] = String.format(LOG, log.getTimestamp(),
                         createFieldsOrTags(log.getFieldsList()));
             }
-            return String.join(",", logs);
+            return String.format(LOGS, String.join(",", logs));
         }
 
         private static String createTags(final Span span) {
-            return createFieldsOrTags(span.getTagsList());
+            return String.format(TAGS, createFieldsOrTags(span.getTagsList()));
         }
 
         private static String createFieldsOrTags(List<Tag> fieldsOrTagsList) {
@@ -93,7 +102,7 @@ public class SpanJsonSerializer implements Serializer<Span> {
                         fieldsOrTags[index] = String.format(STRING_FIELD_OR_TAG, field.getKey(), field.getVStr());
                         break;
                     case VDOUBLE:
-                        fieldsOrTags[index] = String.format(DOUBLE_FIELD_OR_TAG, field.getKey(), field.getVDouble());
+                        fieldsOrTags[index] = String.format(DOUBLE_FIELD_OR_TAG, field.getKey(), Double.toString(field.getVDouble()));
                         break;
                     case VBOOL:
                         fieldsOrTags[index] = String.format(BOOL_FIELD_OR_TAG, field.getKey(), field.getVBool());
