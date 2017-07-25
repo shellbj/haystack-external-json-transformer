@@ -28,7 +28,7 @@ public class SpanJsonSerializerTest {
 
     private final static long LOG1_TIMESTAMP = 234567891;
     private final static String LOG1_FIELD_KEY0 = "doubleField";
-    private final static double LOG1_FIELD_VALUE0 = 6.54321;
+    private final static String LOG1_FIELD_VALUE0 = "6.54321";
     private final static String LOG1_FIELD_KEY1 = "boolField";
     private final static boolean LOG1_FIELD_VALUE1 = false;
 
@@ -43,28 +43,27 @@ public class SpanJsonSerializerTest {
     private final static String TAG_KEY4 = "boolField";
     private final static byte[] TAG_VALUE4 = {0x00, 0x01, 0x02, (byte) 0xFD, (byte) 0xFE, (byte) 0xFF};
 
-    private final static String LOGS_FORMAT_STRING = "[" +
-            "{\"timestamp\":%d,\"fields\":[{\"key\":\"%s\",\"vStr\":\"%s\"},{\"key\":\"%s\",\"vLong\":%d}]}," +
-            "{\"timestamp\":%d,\"fields\":[{\"key\":\"%s\",\"vDouble\":%f},{\"key\":\"%s\",\"vBool\":%b}]}]";
+    private final static String LOGS_FORMAT_STRING = "\"logs\":[" +
+            "{\"timestamp\":\"%d\",\"fields\":[{\"key\":\"%s\",\"vStr\":\"%s\"},{\"key\":\"%s\",\"vLong\":\"%d\"}]}," +
+            "{\"timestamp\":\"%d\",\"fields\":[{\"key\":\"%s\",\"vDouble\":%s},{\"key\":\"%s\",\"vBool\":%b}]}]";
     private final static String LOGS = String.format(LOGS_FORMAT_STRING,
             LOG0_TIMESTAMP, LOG0_FIELD_KEY0, LOG0_FIELD_VALUE0, LOG0_FIELD_KEY1, LOG0_FIELD_VALUE1,
             LOG1_TIMESTAMP, LOG1_FIELD_KEY0, LOG1_FIELD_VALUE0, LOG1_FIELD_KEY1, LOG1_FIELD_VALUE1);
-    private final static String TAGS_FORMAT_STRING = "[" +
+    private final static String TAGS_FORMAT_STRING = "\"tags\":[" +
             "{\"key\":\"%s\",\"vStr\":\"%s\"}," +
-            "{\"key\":\"%s\",\"vLong\":%d}," +
-            "{\"key\":\"%s\",\"vDouble\":%f}," +
+            "{\"key\":\"%s\",\"vLong\":\"%d\"}," +
+            "{\"key\":\"%s\",\"vDouble\":%s}," +
             "{\"key\":\"%s\",\"vBool\":%b}," +
             "{\"key\":\"%s\",\"vBytes\":\"%s\"}]";
     private final static String TAGS = String.format(TAGS_FORMAT_STRING,
             TAG_KEY0, TAG_VALUE0, TAG_KEY1, TAG_VALUE1, TAG_KEY2, TAG_VALUE2, TAG_KEY3, TAG_VALUE3,
             TAG_KEY4, new String(Base64.getEncoder().encode(TAG_VALUE4)));
     private final static String FULLY_POPULATED_FORMAT_STRING = "{\"traceId\":\"%s\",\"spanId\":\"%s\"," +
-            "\"parentSpanId\":\"%s\",\"operationName\":\"%s\",\"startTime\":%d,\"duration\":%d," +
-            "\"logs\":%s,\"tags\":%s}";
-    private final static String FULLY_POPULATED_STRING = String.format(FULLY_POPULATED_FORMAT_STRING,
-            TRACE_ID, SPAN_ID, PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION, LOGS, TAGS);
+            "\"parentSpanId\":\"%s\",\"operationName\":\"%s\",\"startTime\":\"%d\",\"duration\":\"%d\"";
+    private final static String FULLY_POPULATED_STRING = String.format(FULLY_POPULATED_FORMAT_STRING, TRACE_ID, SPAN_ID,
+            PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION) + String.format(",%s,%s}", LOGS, TAGS);
     private final static String NO_TAGS_OR_LOGS_STRING = String.format(FULLY_POPULATED_FORMAT_STRING,
-            TRACE_ID, SPAN_ID, PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION, "[]", "[]");
+            TRACE_ID, SPAN_ID, PARENT_SPAN_ID, OPERATION_NAME, START_TIME, DURATION) + "}";
 
     private SpanJsonSerializer spanJsonSerializer;
 
@@ -150,7 +149,7 @@ public class SpanJsonSerializerTest {
     private Tag createLog1Field0() throws Descriptors.DescriptorValidationException {
         final Tag.Builder fieldBuilder = Tag.newBuilder();
         fieldBuilder.setKey(LOG1_FIELD_KEY0);
-        fieldBuilder.setVDouble(LOG1_FIELD_VALUE0);
+        fieldBuilder.setVDouble(Double.parseDouble(LOG1_FIELD_VALUE0));
         return fieldBuilder.build();
     }
 
