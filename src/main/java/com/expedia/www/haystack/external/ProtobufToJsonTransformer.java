@@ -7,6 +7,8 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
 import org.apache.kafka.streams.processor.WallclockTimestampExtractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -14,6 +16,7 @@ import java.util.Properties;
 public class ProtobufToJsonTransformer {
 
     private final static String CLIENT_ID = "External";
+    private static Logger logger = LoggerFactory.getLogger(ProtobufToJsonTransformer.class);
 
     // TODO Move topics to a centralized location to be used by all services
     private final static String KAFKA_FROM_TOPIC = "SpanObject-ProtobufFormat-Topic-1";
@@ -35,7 +38,7 @@ public class ProtobufToJsonTransformer {
         final StreamsConfig streamsConfig = new StreamsConfig(getProperties());
         final KafkaStreams kafkaStreams = new KafkaStreams(kStreamBuilder, streamsConfig);
         kafkaStreams.start();
-        System.out.println("Now started ScanStream"); // TODO Use a logger instead of System.out.println()
+        logger.info("Now started ScanStream");
     }
 
     // TODO Read configurations from a file with environment-specific values
