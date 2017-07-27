@@ -9,8 +9,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.Map;
 
 public class SpanProtobufDeserializer implements Deserializer<Span> {
-
-    private Logger logger = LoggerFactory.getLogger(SpanProtobufDeserializer.class);
+    static final String ERROR_MSG = "Problem deserializing span [%s]";
+    static Logger logger = LoggerFactory.getLogger(SpanProtobufDeserializer.class);
 
     @Override
     public void configure(Map<String, ?> map, boolean b) {
@@ -26,7 +26,7 @@ public class SpanProtobufDeserializer implements Deserializer<Span> {
             // TODO metrics (count, maybe latency, maybe message size)
             return Span.parseFrom(bytes);
         } catch (Exception exception) {
-            logger.error("Problem deserializing span [%s]", DatatypeConverter.printHexBinary(bytes), exception);
+            logger.error(ERROR_MSG, DatatypeConverter.printHexBinary(bytes), exception);
         }
         return null;
     }
