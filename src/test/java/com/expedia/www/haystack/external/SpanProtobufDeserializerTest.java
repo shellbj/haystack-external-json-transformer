@@ -2,7 +2,6 @@ package com.expedia.www.haystack.external;
 
 import com.expedia.open.tracing.Span;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,8 +66,6 @@ public class SpanProtobufDeserializerTest {
     @Test
     public void testConfigure() throws InvalidProtocolBufferException {
         spanProtobufDeserializer.configure(null, true);
-
-        verifyNoMoreInteractions(mockLogger);
     }
 
     @Test

@@ -5,6 +5,7 @@ import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
 import org.apache.kafka.streams.processor.WallclockTimestampExtractor;
 import org.slf4j.Logger;
@@ -32,8 +33,8 @@ public class ProtobufToJsonTransformer {
         final Serde<String> stringSerde = Serdes.String();
 
         final KStreamBuilder kStreamBuilder = new KStreamBuilder();
-        kStreamBuilder.stream(stringSerde, spanSerde, KAFKA_FROM_TOPIC)
-                .mapValues(span -> Span.newBuilder(span).build()).to(stringSerde, spanSerde, KAFKA_TO_TOPIC);
+        final KStream<String, Span> stream = kStreamBuilder.stream(stringSerde, spanSerde, KAFKA_FROM_TOPIC);
+        stream.mapValues(span -> Span.newBuilder(span).build()).to(stringSerde, spanSerde, KAFKA_TO_TOPIC);
 
         final StreamsConfig streamsConfig = new StreamsConfig(getProperties());
         final KafkaStreams kafkaStreams = new KafkaStreams(kStreamBuilder, streamsConfig);
