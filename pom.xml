@@ -20,6 +20,8 @@
         <maven-compiler-plugin-version>3.6.1</maven-compiler-plugin-version>
         <mockito-version>1.9.5</mockito-version>
         <zookeeper-version>3.4.9</zookeeper-version>
+        <cfg4j-core-version>4.4.1</cfg4j-core-version>
+        <commons-text-version>1.1</commons-text-version>
     </properties>
 
     <dependencies>
@@ -59,8 +61,6 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
             <version>${kafka-version}</version>
-
-
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
         <dependency>
@@ -85,6 +85,18 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${logback-version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.cfg4j/cfg4j-core -->
+        <dependency>
+            <groupId>org.cfg4j</groupId>
+            <artifactId>cfg4j-core</artifactId>
+            <version>${cfg4j-core-version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text-version}</version>
         </dependency>
 
         <!-- Test dependencies -->
