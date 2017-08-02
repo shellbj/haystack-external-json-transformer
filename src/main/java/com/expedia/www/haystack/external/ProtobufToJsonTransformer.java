@@ -1,6 +1,7 @@
 package com.expedia.www.haystack.external;
 
 import com.expedia.open.tracing.Span;
+import org.apache.commons.text.StrSubstitutor;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -8,16 +9,22 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
 import org.apache.kafka.streams.processor.WallclockTimestampExtractor;
+import org.cfg4j.provider.ConfigurationProvider;
+import org.cfg4j.provider.ConfigurationProviderBuilder;
+import org.cfg4j.source.classpath.ClasspathConfigurationSource;
+import org.cfg4j.source.context.filesprovider.ConfigFilesProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Properties;
 
 // TODO Write a test to exercise this code (probably an integration test)
 public class ProtobufToJsonTransformer {
 
-    private final static String CLIENT_ID = "External";
-    private static Logger logger = LoggerFactory.getLogger(ProtobufToJsonTransformer.class);
+    final static String CLIENT_ID = "External";
+    static Logger logger = LoggerFactory.getLogger(ProtobufToJsonTransformer.class);
 
     // TODO Move topics to a centralized location to be used by all services
     private final static String KAFKA_FROM_TOPIC = "SpanObject-ProtobufFormat-Topic-1";
@@ -48,9 +55,19 @@ public class ProtobufToJsonTransformer {
         props.put(StreamsConfig.CLIENT_ID_CONFIG, CLIENT_ID);
         props.put("group.id", KLASS_NAME);
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, KLASS_SIMPLE_NAME);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.101:9092");
+        final String kafkaIpAndPort = getKafkaIpAnPort();
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaIpAndPort);
         props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 1);
         props.put(StreamsConfig.TIMESTAMP_EXTRACTOR_CLASS_CONFIG, WallclockTimestampExtractor.class);
         return props;
+    }
+
+    private static String getKafkaIpAnPort() {
+        // TODO Add EnvironmentVariablesConfigurationSource object first in list for env variable from apply-compose.sh
+        final ConfigFilesProvider cfp = () -> Arrays.asList(Paths.get("base.yaml"));
+        final ClasspathConfigurationSource ccs = new ClasspathConfigurationSource(cfp);
+        final ConfigurationProvider cp = new ConfigurationProviderBuilder().withConfigurationSource(ccs).build();
+        final KafkaConfig kafkaConfig = cp.bind("haystack.kafka", KafkaConfig.class);
+        return StrSubstitutor.replaceSystemProperties(kafkaConfig.brokers()) + ":" + kafkaConfig.port();
     }
 }
