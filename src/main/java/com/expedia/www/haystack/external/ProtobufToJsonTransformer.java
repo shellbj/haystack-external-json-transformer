@@ -28,6 +28,10 @@ public class ProtobufToJsonTransformer {
 
     static Factory factory = new Factory(); // will be mocked out in unit tests
     static Logger logger = LoggerFactory.getLogger(ProtobufToJsonTransformer.class);
+    // TODO Add EnvironmentVariablesConfigurationSource object to handle env variables from apply-compose.sh et al
+    private static ConfigFilesProvider cfp = () -> Collections.singletonList(Paths.get("base.yaml"));
+    private static ClasspathConfigurationSource ccs = new ClasspathConfigurationSource(cfp);
+    private static ConfigurationProvider cp = new ConfigurationProviderBuilder().withConfigurationSource(ccs).build();
 
     // TODO Move topics to a centralized location to be used by all services
     static final String KAFKA_FROM_TOPIC = "SpanObject-ProtobufFormat-Topic-1";
@@ -58,18 +62,20 @@ public class ProtobufToJsonTransformer {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, KLASS_NAME);
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, KLASS_SIMPLE_NAME);
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, getKafkaIpAnPort());
-        props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 1);
+        props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, getReplicationFactor());
         props.put(StreamsConfig.TIMESTAMP_EXTRACTOR_CLASS_CONFIG, WallclockTimestampExtractor.class);
         return props;
     }
 
     private static String getKafkaIpAnPort() {
-        // TODO Add EnvironmentVariablesConfigurationSource object to handle env variables from apply-compose.sh et al
-        final ConfigFilesProvider cfp = () -> Collections.singletonList(Paths.get("base.yaml"));
-        final ClasspathConfigurationSource ccs = new ClasspathConfigurationSource(cfp);
-        final ConfigurationProvider cp = new ConfigurationProviderBuilder().withConfigurationSource(ccs).build();
         final KafkaConfig kafkaConfig = cp.bind("haystack.kafka", KafkaConfig.class);
         return StrSubstitutor.replaceSystemProperties(kafkaConfig.brokers()) + ":" + kafkaConfig.port();
+    }
+
+    private static int getReplicationFactor() {
+        final IntermediateStreamsConfig intermediateStreamsConfig = cp.bind("haystack.pipe.streams",
+                IntermediateStreamsConfig.class);
+        return intermediateStreamsConfig.replicationFactor();
     }
 
     static class Factory {

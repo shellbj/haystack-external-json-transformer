@@ -123,7 +123,7 @@ public class ProtobufToJsonTransformerTest {
         assertEquals(ProtobufToJsonTransformer.CLIENT_ID, properties.get(StreamsConfig.CLIENT_ID_CONFIG));
         assertEquals(ProtobufToJsonTransformer.KLASS_NAME, properties.get(ConsumerConfig.GROUP_ID_CONFIG));
         assertEquals(ProtobufToJsonTransformer.KLASS_SIMPLE_NAME, properties.get(StreamsConfig.APPLICATION_ID_CONFIG));
-        assertEquals("192.168.99.101:9092", properties.get(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG));
+        assertEquals("haystack.local:9092", properties.get(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG));
         assertEquals(1, properties.get(StreamsConfig.REPLICATION_FACTOR_CONFIG));
         assertEquals(WallclockTimestampExtractor.class, properties.get(StreamsConfig.TIMESTAMP_EXTRACTOR_CLASS_CONFIG));
     }
