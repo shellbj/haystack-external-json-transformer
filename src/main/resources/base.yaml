@@ -6,3 +6,8 @@ haystack:
   pipe:
     streams:
       replicationFactor: 1
+  graphite:
+     prefix: "haystack"
+     address: "haystack.local" # set in /etc/hosts per instructions in haystack-deployment package
+     port: 2003 # default Graphite port, rarely overridden, but can be overridden by env variable
+     pollIntervalSeconds: 60

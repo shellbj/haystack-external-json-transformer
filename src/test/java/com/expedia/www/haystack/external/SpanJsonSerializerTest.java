@@ -41,6 +41,9 @@ public class SpanJsonSerializerTest {
     @After
     public void tearDown() {
         SpanJsonSerializer.logger = realLogger;
+        SpanJsonSerializer.errorCount.increment(-((long) SpanJsonSerializer.errorCount.getValue()));
+        SpanJsonSerializer.requestCount.increment(-((long) SpanJsonSerializer.requestCount.getValue()));
+        SpanJsonSerializer.bytesIn.increment(-((long) SpanJsonSerializer.bytesIn.getValue()));
         verifyNoMoreInteractions(mockPrinter, mockLogger);
     }
 
@@ -50,6 +53,7 @@ public class SpanJsonSerializerTest {
 
         final String string = new String(byteArray);
         assertEquals(TestConstantsAndCommonCode.JSON_SPAN_STRING, string);
+        verifyCounters(0L, 1, byteArray.length);
     }
 
     @Test
@@ -64,6 +68,7 @@ public class SpanJsonSerializerTest {
         assertNull(shouldBeNull);
         verify(mockPrinter).print(span);
         verify(mockLogger).error(SpanJsonSerializer.ERROR_MSG, span, exception);
+        verifyCounters(1, 1, 0);
     }
 
     @Test
@@ -71,6 +76,7 @@ public class SpanJsonSerializerTest {
         final Printer printer = injectMockPrinter();
         spanJsonSerializer.configure(null, true);
         SpanJsonSerializer.printer = printer;
+        verifyCounters(0, 0, 0);
     }
 
     @Test
@@ -78,6 +84,7 @@ public class SpanJsonSerializerTest {
         final Printer printer = injectMockPrinter();
         spanJsonSerializer.close();
         SpanJsonSerializer.printer = printer;
+        verifyCounters(0, 0, 0);
     }
 
     private Printer injectMockPrinter() {
@@ -86,4 +93,9 @@ public class SpanJsonSerializerTest {
         return printer;
     }
 
+    private void verifyCounters(long errorCount, long requestCount, long bytesIn) {
+        assertEquals(errorCount, SpanJsonSerializer.errorCount.getValue());
+        assertEquals(requestCount, SpanJsonSerializer.requestCount.getValue());
+        assertEquals(bytesIn, SpanJsonSerializer.bytesIn.getValue());
+    }
 }
