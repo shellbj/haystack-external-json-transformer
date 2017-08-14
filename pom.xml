@@ -22,6 +22,7 @@
         <zookeeper-version>3.4.9</zookeeper-version>
         <cfg4j-core-version>4.4.1</cfg4j-core-version>
         <commons-text-version>1.1</commons-text-version>
+        <servo-version>0.12.17</servo-version>
     </properties>
 
     <dependencies>
@@ -97,6 +98,18 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>${commons-text-version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.netflix.servo/servo-core -->
+        <dependency>
+            <groupId>com.netflix.servo</groupId>
+            <artifactId>servo-core</artifactId>
+            <version>${servo-version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.netflix.servo/servo-graphite -->
+        <dependency>
+            <groupId>com.netflix.servo</groupId>
+            <artifactId>servo-graphite</artifactId>
+            <version>${servo-version}</version>
         </dependency>
 
         <!-- Test dependencies -->
