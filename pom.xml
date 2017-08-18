@@ -18,11 +18,13 @@
         <protobuf-java-util-version>3.3.1</protobuf-java-util-version>
         <junit-version>4.12</junit-version>
         <maven-compiler-plugin-version>3.6.1</maven-compiler-plugin-version>
+        <maven-jar-plugin-version>3.0.2</maven-jar-plugin-version>
         <mockito-version>1.9.5</mockito-version>
         <zookeeper-version>3.4.9</zookeeper-version>
         <cfg4j-core-version>4.4.1</cfg4j-core-version>
         <commons-text-version>1.1</commons-text-version>
         <servo-version>0.12.17</servo-version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -134,6 +136,7 @@
                 <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin-version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -41,9 +41,9 @@ public class SpanJsonSerializerTest {
     @After
     public void tearDown() {
         SpanJsonSerializer.logger = realLogger;
-        SpanJsonSerializer.errorCount.increment(-((long) SpanJsonSerializer.errorCount.getValue()));
-        SpanJsonSerializer.requestCount.increment(-((long) SpanJsonSerializer.requestCount.getValue()));
-        SpanJsonSerializer.bytesIn.increment(-((long) SpanJsonSerializer.bytesIn.getValue()));
+        SpanJsonSerializer.ERROR.increment(-((long) SpanJsonSerializer.ERROR.getValue()));
+        SpanJsonSerializer.REQUEST.increment(-((long) SpanJsonSerializer.REQUEST.getValue()));
+        SpanJsonSerializer.BYTES_IN.increment(-((long) SpanJsonSerializer.BYTES_IN.getValue()));
         verifyNoMoreInteractions(mockPrinter, mockLogger);
     }
 
@@ -94,8 +94,8 @@ public class SpanJsonSerializerTest {
     }
 
     private void verifyCounters(long errorCount, long requestCount, long bytesIn) {
-        assertEquals(errorCount, SpanJsonSerializer.errorCount.getValue());
-        assertEquals(requestCount, SpanJsonSerializer.requestCount.getValue());
-        assertEquals(bytesIn, SpanJsonSerializer.bytesIn.getValue());
+        assertEquals(errorCount, SpanJsonSerializer.ERROR.getValue());
+        assertEquals(requestCount, SpanJsonSerializer.REQUEST.getValue());
+        assertEquals(bytesIn, SpanJsonSerializer.BYTES_IN.getValue());
     }
 }

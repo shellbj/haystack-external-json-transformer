@@ -1,11 +1,11 @@
-package com.expedia.www.haystack.external;
+package com.expedia.www.haystack.metrics;
 
 public interface GraphiteConfig {
-    String prefix();
-
     String address();
 
     int port();
 
     int pollIntervalSeconds();
+
+    int queueSize();
 }

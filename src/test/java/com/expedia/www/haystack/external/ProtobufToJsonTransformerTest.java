@@ -2,6 +2,7 @@ package com.expedia.www.haystack.external;
 
 import com.expedia.open.tracing.Span;
 import com.expedia.www.haystack.external.ProtobufToJsonTransformer.Factory;
+import com.netflix.servo.publish.PollScheduler;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.streams.KafkaStreams;
@@ -22,8 +23,8 @@ import org.slf4j.Logger;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static com.expedia.www.haystack.external.ProtobufToJsonTransformer.KAFKA_FROM_TOPIC;
-import static com.expedia.www.haystack.external.ProtobufToJsonTransformer.KAFKA_TO_TOPIC;
+import static com.expedia.www.haystack.external.Constants.KAFKA_FROM_TOPIC;
+import static com.expedia.www.haystack.external.Constants.KAFKA_TO_TOPIC;
 import static com.expedia.www.haystack.external.ProtobufToJsonTransformer.STARTED_MSG;
 import static com.expedia.www.haystack.external.ProtobufToJsonTransformer.getProperties;
 import static org.junit.Assert.assertEquals;
@@ -69,6 +70,9 @@ public class ProtobufToJsonTransformerTest {
     public void tearDown() {
         ProtobufToJsonTransformer.factory = realFactory;
         ProtobufToJsonTransformer.logger = realLogger;
+        if(PollScheduler.getInstance().isStarted()) {
+            PollScheduler.getInstance().stop();
+        }
         verifyNoMoreInteractions(mockFactory, mockLogger, mockKStreamBuilder, mockKStreamStringSpan,
                 mockKStreamStringSpanJsonSerializer, mockKafkaStreams);
     }

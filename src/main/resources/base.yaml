@@ -1,6 +1,5 @@
 haystack:
   kafka:
-  # TODO write value from $(minikube ip) to a file and use that file here instead of hardcoding in the next line
      brokers: "haystack.local" # set in /etc/hosts per instructions in haystack-deployment package
      port: 9092 # default Kafka port, rarely overridden, but can be overridden by env variable
   pipe:
@@ -11,3 +10,4 @@ haystack:
      address: "haystack.local" # set in /etc/hosts per instructions in haystack-deployment package
      port: 2003 # default Graphite port, rarely overridden, but can be overridden by env variable
      pollIntervalSeconds: 60
+     queueSize: 10
